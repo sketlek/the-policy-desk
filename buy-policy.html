@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Buy Policy</title><link rel="stylesheet" href="css/styles.css"></head><body>
+<nav><div class="logo">THE <span>POLICY DESK</span></div><div class="menu"><a href="index.html">Home</a><a href="services.html">Services</a><a href="policy.html">Policies</a><a href="about.html">About</a><a href="book-appointment.html">Book</a><a href="buy-policy.html" class="btn-nav active">Buy Policy</a></div></nav>
+<div class="section"><h2>Buy Policy Online</h2><p class="sub">Pay via M-Pesa Paybill 247247 Account 011331 - Secure & Direct to ICEA LION</p><div class="form-box"><label>Full Name *</label><input id="bname" required><label>Phone *</label><input id="bphone" placeholder="+254..."><label>ID Number *</label><input id="bid"><label>Policy Type *</label><select id="btype"><option>Life Insurance</option><option>Health Insurance</option><option>Education Policy</option><option>Motor Insurance</option><option>Business Insurance</option></select><label>Amount / Premium</label><input id="bamount" placeholder="e.g. 1500 per month"><label>M-Pesa Code (after payment)</label><input id="bmpesa" placeholder="e.g. QGH..."><button id="buyBtn">Submit Policy Request</button><p style="font-size:11px;color:#64748b;margin-top:8px;text-align:center">Pay first to Paybill 247247 Acc 011331 then submit code. We verify in 1 hour.</p></div></div>
+<script>
+document.getElementById('buyBtn').addEventListener('click',async()=>{
+ let data={name:bname.value,phone:bphone.value,id_number:bid.value,policy_type:btype.value,amount:bamount.value,mpesa_code:bmpesa.value};
+ if(!data.name||!data.phone){alert('Fill name & phone');return;}
+ let btn=document.getElementById('buyBtn');btn.textContent='Submitting...';
+ try{let r=await fetch('api-buy-policy.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});let j=await r.json();alert(j.message);if(j.success)location.reload();}catch(e){alert('Start XAMPP MySQL');}
+ btn.textContent='Submit Policy Request';
+});
+</script>
+<footer>© 2026 The Policy Desk</footer></body></html>
