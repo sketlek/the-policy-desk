@@ -1,25 +1,26 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Book Appointment</title><link rel="stylesheet" href="css/styles.css"></head><body>
 <nav><div class="logo">THE <span>POLICY DESK</span></div><div class="menu"><a href="index.html">Home</a><a href="services.html">Services</a><a href="policy.html">Policies</a><a href="about.html">About</a><a href="book-appointment.html" class="active">Book</a><a href="buy-policy.html" class="btn-nav">Buy Policy</a></div></nav>
-<div class="section"><h2>Book 30-Min Consultation</h2><p class="sub">System blocks double booking - your time is locked once booked</p><div class="form-box"><p id="msg" style="font-size:12px;font-weight:700;text-align:center;margin-bottom:8px"></p><label>Date *</label><input type="date" id="date" required><label>Time (30 min each) *</label><select id="time"><option>Choose date first</option></select><label>Meeting Type *</label><div class="toggle"><input type="radio" name="meet" id="online" value="Online Meeting" checked><label for="online">💻 Online</label><input type="radio" name="meet" id="physical" value="One-on-One"><label for="physical">🤝 One-on-One</label></div><label>Name *</label><input id="name"><label>Phone *</label><input id="phone" placeholder="+254..."><label>Email</label><input id="email"><label>Service</label><select id="service"><option>Life Insurance</option><option>Health Insurance</option><option>Education Policy</option><option>Motor Insurance</option><option>Raise Request</option></select><label>Message</label><textarea id="message"></textarea><button id="bookBtn">Confirm 30-Min Booking</button></div></div>
+<div class="section"><h2>Book 30-Min Consultation</h2><p class="sub">System blocks double booking - your time is locked once booked</p><div class="form-box"><p id="msg" style="font-size:12px;font-weight:700;text-align:center;margin-bottom:8px"></p><label>Date *</label><input type="date" id="date" required><label>Time (30 min each) *</label><select id="time"><option value="">Choose date first</option></select><label>Meeting Type *</label><div class="toggle"><input type="radio" name="meet" id="online" value="Online Meeting" checked><label for="online">💻 Online</label><input type="radio" name="meet" id="physical" value="One-on-One"><label for="physical">🤝 One-on-One</label></div><label>Name *</label><input id="name"><label>Phone *</label><input id="phone" placeholder="+254..."><label>Email</label><input id="email"><label>Service</label><select id="service"><option>Life Insurance</option><option>Health Insurance</option><option>Education Policy</option><option>Motor Insurance</option><option>Raise Request</option></select><label>Message</label><textarea id="message"></textarea><button id="bookBtn">Confirm 30-Min Booking</button></div></div>
 <script>
 const dateI=document.getElementById('date'),timeS=document.getElementById('time'),msg=document.getElementById('msg');
-dateI.min=new Date().toISOString().split('T')[0];
+dateI.min=new Date().toLocaleDateString('en-CA');
 dateI.addEventListener('change',async()=>{
- let d=dateI.value;timeS.innerHTML='<option>Loading...</option>';
+ let d=dateI.value;timeS.innerHTML='<option value="">Loading...</option>';
  try{let r=await fetch('api-available-slots.php?date='+d);let slots=await r.json();timeS.innerHTML='';
- if(slots.length==0){timeS.innerHTML='<option>Fully Booked</option>';msg.textContent='❌ All slots booked - choose another date';msg.style.color='red';}
+ if(slots.length==0){timeS.innerHTML='<option value="">No slots available</option>';msg.textContent='❌ No free slots on this date (closed Sundays) - choose another date';msg.style.color='red';}
  else{slots.forEach(s=>{let o=document.createElement('option');o.value=s;o.textContent=s;timeS.appendChild(o);});msg.textContent='✅ '+slots.length+' slots free - 30 min each';msg.style.color='green';}
 } catch(err){
   console.log(err);
-  alert('Real Error: ' + err.message);
+  timeS.innerHTML='<option value="">Could not load slots</option>';msg.textContent='❌ Could not load slots - is XAMPP running?';msg.style.color='red';
 }
 });
 document.getElementById('bookBtn').addEventListener('click',async(e)=>{
  e.preventDefault();
- let payload={date:dateI.value,time:timeS.value,meetingType:document.querySelector('input[name="meet"]:checked').value,name:name.value,phone:phone.value,email:email.value,service:service.value,message:message.value};
+ if(!timeS.value){alert('Please pick a date and an available time');return;}
+ let payload={date:dateI.value,time:timeS.value,meetingType:document.querySelector('input[name="meet"]:checked').value,name:document.getElementById('name').value,phone:document.getElementById('phone').value,email:document.getElementById('email').value,service:document.getElementById('service').value,message:document.getElementById('message').value};
  let btn=e.target;btn.textContent='Booking...';btn.disabled=true;
  try{let res=await fetch('api-book-appointment.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});let j=await res.json();alert(j.message);if(j.success)location.reload();}catch(err){alert('Error - Start XAMPP');}
  btn.textContent='Confirm 30-Min Booking';btn.disabled=false;
 });
 </script>
-<footer>© 2026 The Policy Desk | 30 Min Per Client - No Double Booking</footer></body></html>
+<footer>© 2026 The Policy Desk | 30 Min Per Client - No Double Booking</footer></body></html>
